@@ -1,24 +1,46 @@
 export class PigReport{
+  key: string | undefined;
   reporter: Person;
+  time: number | undefined;
   pigInfo: Pig;
   location: PigLocation;
+  status: Status;
   notes: String;
 
-  constructor(reporter:Person, pigInfo:Pig, location:PigLocation, notes:String){
+
+  constructor(reporter:Person, pigInfo:Pig, location:PigLocation,status:  Status, notes:String){
+    this.generateReportID();
+    this.generateTime();
     this.reporter = reporter;
     this.pigInfo = pigInfo;
     this.location = location;
+    this.status = status;
     this.notes = notes;
+  }
+
+  private generateReportID() {
+    this.key = Date.now().toString(36) + Math.random().toString(36).slice(2);
+  }
+
+  private generateTime() {
+    this.time = Date.now();
   }
 }
 
+export enum Status{
+  retrieved= "Retrieved",
+  readyPickup = "Ready for Pickup"
+}
+
+
+
 export class Person{
   name : String;
-  phonenumber : number;
+  phoneNumber : number;
 
-  constructor(name:String, phonenumber: number) {
+  constructor(name:String, phoneNumber: number) {
     this.name = name;
-    this.phonenumber = phonenumber;
+    this.phoneNumber = phoneNumber;
   }
 }
 export class Pig{

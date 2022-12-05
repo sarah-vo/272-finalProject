@@ -1,24 +1,68 @@
-import { Component , AfterViewInit} from '@angular/core';
-import {Pig,PigReport,PigLocation,Person} from './ts/PigReport'
+import {Component, ElementRef, EventEmitter, NgModule, Output, ViewChild} from '@angular/core';
+import {Person, Pig, PigLocation, PigReport, Status} from './ts/PigReport'
+import {Data, ReportService} from "./service/report-service/report.service";
+import {ReactiveFormsModule} from "@angular/forms";
+import 'reflect-metadata';
+import {deserialize, plainToClass} from "class-transformer";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
+
+
+
 export class AppComponent {
   title = 'finalAssignment';
   pigReports : PigReport[] | undefined;
   newPigReport: PigReport | undefined;
   deletedPigReport: PigReport | undefined;
+  @Output() triggerNewReport=  new EventEmitter<boolean>();
+
+  reportForShow: PigReport | undefined;
+  showReportDrawer:boolean = false;
+  showReportCreate:boolean = false;
+
+  subscribeNewPig(){
+    let rp;
+    this.reportService.newPigReport.subscribe((data:PigReport)=>{
+      rp =  data;
+    })
+    return rp;
+  }
+
+
+  subscribeDeletedPig(){
+    let rp;
+    this.reportService.deletedPigReport.subscribe((data:PigReport)=>{
+      rp =  data;
+    })
+    return rp;
+  }
+
+
+  constructor(private reportService: ReportService) {
+  }
 
   ngOnInit(){
-      this.pigReports =[
-        new PigReport(new Person("Sarah",0),new Pig(123,"Hock"),new PigLocation(-122.915667,49.278931,"SFU Burnaby"),""),
-        new PigReport(new Person("Sarah",0),new Pig(123,"Hock"),new PigLocation(-122.915667,49.278931,"SFU Burnaby"),""),
-        new PigReport(new Person("Sarah",0),new Pig(281,"Hock"),new PigLocation( -123.100208,49.277420,"Downtown"),""),
-        new PigReport(new Person("Sarah",0),new Pig(135,"Hock"),new PigLocation( -123.100208,49.277420,"Downtown"),""),
-        new PigReport(new Person("Sarah",0),new Pig(165,"Hock"),new PigLocation( -123.100208,49.277420,"Downtown"),""),
-      ]
+    this.reportService.getReport().subscribe((data:any) =>{
+        this.pigReports = (data.map((obj: Data) => plainToClass(PigReport, obj.data)));
+      })
   }
+
+  showReport(report: PigReport){
+    this.reportForShow = report;
+    this.showReportDrawer = true;
+  }
+
+  showCreateReport(){
+    this.showReportCreate = true;
+  }
+
+  disableDrawer = () =>{
+    this.showReportDrawer = false;
+    this.showReportCreate = false;
+  }
+
 }

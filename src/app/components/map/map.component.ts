@@ -1,7 +1,18 @@
-import {AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
-import {Person, Pig, PigLocation, PigReport} from "../ts/PigReport";
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+  IterableDiffer,
+  IterableDiffers, KeyValueDiffers
+} from '@angular/core';
+import {Person, Pig, PigLocation, PigReport} from "../../ts/PigReport";
 
 import * as leaf from "leaflet";
+import {ReportService} from "../../service/report-service/report.service";
 
 
 @Component({
@@ -10,11 +21,6 @@ import * as leaf from "leaflet";
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements AfterViewInit, OnChanges{
-  nullReport = new PigReport(
-    new Person("Null",696969),
-    new Pig(123,""),
-    new PigLocation(12,12,""),
-    "");
   @Input() pigReports : PigReport[] | undefined;
   @Input() newPigReport : PigReport | undefined;
   @Input() deletedPigReport : PigReport | undefined;
@@ -22,11 +28,16 @@ export class MapComponent implements AfterViewInit, OnChanges{
   map: leaf.Map| undefined;
   markerMap = new Map<PigLocation, leaf.Marker>;
 
+  constructor(private reportService: ReportService){}
 
   @ViewChild('map')
   private mapContainer!: ElementRef<HTMLElement>;
 
+
+
+
   ngOnInit() {
+
     const iconRetinaUrl = 'assets/marker-icon-2x.png';
     const iconUrl = 'assets/marker-icon.png';
     const shadowUrl = 'assets/marker-shadow.png';
@@ -114,7 +125,7 @@ export class MapComponent implements AfterViewInit, OnChanges{
   }
 
   generateMarker(pigReport: PigReport) {
-    let marker = new leaf.Marker(pigReport.location.ladLong())
+    let marker = new leaf.Marker([pigReport.location.latitude, pigReport.location.longitude])
       .bindPopup(this.addPopup(this.pigReports!, pigReport))
       .on("click", () => {
         console.log("marker clicked")

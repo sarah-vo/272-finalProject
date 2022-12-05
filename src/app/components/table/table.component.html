@@ -1,0 +1,29 @@
+<table class="table-auto w-full h-fit">
+  <thead>
+  <tr class="sticky top-0 bg-gray-100">
+    <th class=" py-4 text-left">Location</th>
+    <th class=" py-4 text-left">Pig ID</th>
+    <th class=" py-4 text-left">Reported By</th>
+    <th class=" py-4 text-left">Status</th>
+    <th class=" py-4 text-left">Time</th>
+    <th class=" py-4 text-left">More Info</th>
+  </tr>
+  </thead>
+  <tbody class="">
+    <tr  *ngFor="let report of pigReports," >
+      <td class="py-2 font-medium text-base">{{report["location"]["name"]}}</td>
+      <td class="py-2 font-medium text-base">{{report["pigInfo"]["pigID"]}}</td>
+      <td class="py-2 font-medium text-base">{{report["reporter"]["name"]}}</td>
+      <td class="py-2 font-medium text-base">{{report["status"]}}</td>
+      <td class="py-2 font-medium text-base">{{report["time"] | date:'medium'}}</td>
+      <td class="py-2 font-medium text-base flex flex-row gap-4 items-center">
+        <button (click)="triggerPigReport(report); $event.stopPropagation()" class="w-fit h-[40px] px-4 py-2 rounded bg-blue-400 active:bg-blue-500
+                          text-white text-center font-semibold">
+        More Info</button>
+        <button (click)="this.deletePigReport(report)" class="w-fit h-[40px] px-4 py-2 bg-red-400 active:bg-red-500 rounded ">
+          <mat-icon fontIcon="delete" class="text-white"></mat-icon>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>

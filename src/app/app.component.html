@@ -1,5 +1,18 @@
-<app-heading></app-heading>
-<div>
-  <app-map [pigReports] = "pigReports" [deletedPigReport]="deletedPigReport" [newPigReport]="newPigReport"></app-map>
+<div class="flex flex-col h-screen">
+  <app-heading (createReport)="showCreateReport()"></app-heading>
+  <app-drawer  (broadcastDisableVisibility) = "disableDrawer()"
+              [pigReport]="reportForShow" [toggleViewReport]="showReportDrawer"
+              [toggleCreateReport]="showReportCreate"></app-drawer>
 
+  <div class="flex-grow flex flex-col">
+    <div class="h-[60%]">
+      <app-map *ngIf="pigReports"
+               [pigReports] = "pigReports"
+               [deletedPigReport]="subscribeDeletedPig()"
+               [newPigReport]="subscribeNewPig()">
+      </app-map>
+    </div>
+    <app-table class="h-[40%] overflow-y-auto" [pigReports]="pigReports" (pigReportInfo)="showReport($event)">
+    </app-table>
+  </div>
 </div>

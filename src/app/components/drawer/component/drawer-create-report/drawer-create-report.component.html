@@ -1,0 +1,56 @@
+<form [formGroup]="pigReportForm" class="">
+  <mat-form-field class="w-fit">
+    <mat-label >Reporter Name:</mat-label>
+    <input matInput id ="reporterName" type="text" formControlName="reporterName">
+  </mat-form-field>
+
+  <mat-form-field class="w-fit">
+    <mat-label >Reporter Phone Number:</mat-label>
+    <input matInput id="reporterNumber" type="text" formControlName="reporterNumber">
+  </mat-form-field>
+
+
+  <mat-form-field class="w-fit">
+    <mat-label>Pig #:</mat-label>
+    <input matInput id="newPigID" type="text" formControlName="newPigID">
+  </mat-form-field>
+
+  <mat-form-field class="w-fit">
+    <mat-label>Pig Breed:</mat-label>
+    <input matInput id="newPigBreed" type="text" formControlName="newPigBreed">
+  </mat-form-field>
+
+
+  <mat-form-field class="w-fit">
+    <mat-label>Longitude</mat-label>
+    <input matInput id="longitude" type="text" formControlName="locationLongitude">
+  </mat-form-field>
+
+  <mat-form-field class="w-fit">
+    <mat-label>Latitude</mat-label>
+    <input matInput id="latitude" type="text" formControlName="locationLatitude">
+  </mat-form-field>
+
+  <mat-form-field class="w-fit">
+    <mat-label>Location Name:</mat-label>
+    <input matInput id="locationName" type="text" formControlName="locationName">
+  </mat-form-field>
+
+    <mat-form-field class="w-fit">
+    <mat-label>Pickup Status:</mat-label>
+      <mat-select formControlName="status">
+        <mat-option [value]="this.Status.readyPickup">{{this.Status.readyPickup.toString()}}</mat-option>
+        <mat-option [value]="this.Status.retrieved">{{this.Status.retrieved.toString()}}</mat-option>
+      </mat-select>
+  </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-fit">
+    <mat-label>Notes:</mat-label>
+    <input matInput id="notes" type="text" formControlName="notes">
+  </mat-form-field>
+
+
+  <button (click)="this.onSubmit()" class="w-fit h-[40px] px-4 py-2 bg-blue-400 active:bg-blue-500 rounded ">
+    Submit
+  </button>
+</form>
