@@ -4,7 +4,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ### Live demo
 
-Visit `https://sarah-vo.github.io/272-finalProject/`.
+Visit the demo version [here!](https://sarah-vo.github.io/272-finalProject/).
 
 ## Development server
 
