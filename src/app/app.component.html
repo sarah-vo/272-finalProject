@@ -8,8 +8,8 @@
     <div class="h-[60%]">
       <app-map *ngIf="pigReports"
                [pigReports] = "pigReports"
-               [deletedPigReport]="subscribeDeletedPig()"
-               [newPigReport]="subscribeNewPig()">
+               [deletedPigReport]="deletedPigReport"
+               [newPigReport]="newPigReport">
       </app-map>
     </div>
     <app-table class="h-[40%] overflow-y-auto" [pigReports]="pigReports" (pigReportInfo)="showReport($event)">

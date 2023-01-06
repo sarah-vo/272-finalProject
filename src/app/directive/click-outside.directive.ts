@@ -1,5 +1,4 @@
 import {Directive, ElementRef, EventEmitter, HostListener, Output} from "@angular/core";
-import {MatSelect} from "@angular/material/select";
 
 @Directive({
   selector: '[clickOutside]'
