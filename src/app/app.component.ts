@@ -1,9 +1,8 @@
-import {Component, ElementRef, EventEmitter, NgModule, Output, ViewChild} from '@angular/core';
-import {Person, Pig, PigLocation, PigReport, Status} from './ts/PigReport'
+import {Component, EventEmitter, Output} from '@angular/core';
+import {PigReport} from './ts/PigReport'
 import {Data, ReportService} from "./service/report-service/report.service";
-import {ReactiveFormsModule} from "@angular/forms";
 import 'reflect-metadata';
-import {deserialize, plainToClass} from "class-transformer";
+import {plainToClass} from "class-transformer";
 
 @Component({
   selector: 'app-root',
@@ -25,20 +24,26 @@ export class AppComponent {
   showReportCreate:boolean = false;
 
   subscribeNewPig(){
-    let rp;
-    this.reportService.newPigReport.subscribe((data:PigReport)=>{
+    let rp:PigReport | undefined;
+    this.reportService.newPigReportChanges$.subscribe((data:PigReport)=>{
       rp =  data;
+      console.log(`before push:`);
+      console.log(this.pigReports);
+      this.pigReports!.push(rp!);
+      console.log(this.pigReports);
+      this.newPigReport = rp;
     })
-    return rp;
   }
 
 
   subscribeDeletedPig(){
-    let rp;
-    this.reportService.deletedPigReport.subscribe((data:PigReport)=>{
+
+    let rp: PigReport | undefined;
+    this.reportService.deletedPigReportChanges$.subscribe((data:PigReport)=>{
       rp =  data;
+      this.pigReports = this.pigReports!.filter((report)=> report.key != rp!.key);
+      this.deletedPigReport = rp;
     })
-    return rp;
   }
 
 
@@ -48,7 +53,9 @@ export class AppComponent {
   ngOnInit(){
     this.reportService.getReport().subscribe((data:any) =>{
         this.pigReports = (data.map((obj: Data) => plainToClass(PigReport, obj.data)));
-      })
+      });
+    this.subscribeNewPig();
+    this.subscribeDeletedPig()
   }
 
   showReport(report: PigReport){

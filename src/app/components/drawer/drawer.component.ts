@@ -1,4 +1,4 @@
-import {Component, EventEmitter, HostListener, Input, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {PigReport} from "../../ts/PigReport";
 
 @Component({
