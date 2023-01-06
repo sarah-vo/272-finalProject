@@ -3,9 +3,13 @@ import {
   Component,
   ElementRef,
   Input,
-  ViewChild
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+  IterableDiffer,
+  IterableDiffers, KeyValueDiffers
 } from '@angular/core';
-import {PigLocation, PigReport} from "../../ts/PigReport";
+import {Person, Pig, PigLocation, PigReport} from "../../ts/PigReport";
 
 import * as leaf from "leaflet";
 import {ReportService} from "../../service/report-service/report.service";
@@ -16,7 +20,7 @@ import {ReportService} from "../../service/report-service/report.service";
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements AfterViewInit{
+export class MapComponent implements AfterViewInit, OnChanges{
   @Input() pigReports : PigReport[] | undefined;
   @Input() newPigReport : PigReport | undefined;
   @Input() deletedPigReport : PigReport | undefined;
@@ -47,9 +51,6 @@ export class MapComponent implements AfterViewInit{
       tooltipAnchor: [16, -28],
       shadowSize: [41, 41]
     });
-
-    this.mapSubscribeNewReport();
-    this.mapSubscribeDeletedReport();
   }
 
   ngAfterViewInit() {
@@ -58,46 +59,33 @@ export class MapComponent implements AfterViewInit{
 
   }
 
-  mapSubscribeNewReport(){
-    this.reportService.newPigReportChanges$.subscribe((data:PigReport)=>{
-      this.handleNewPig(this.map!, data);
-    });
-  }
+  ngOnChanges(changes : SimpleChanges){
+    if(changes['pigReports'] && changes['pigReports'].currentValue) {
+      console.log(`List of pig reports changed. You now have ${this.pigReports?.length} pig reports`)
+      if (changes['newPigReport'] && changes['newPigReport'].currentValue) {
+        console.log(`Adding pig: ${this.newPigReport}`)
+        this.handleNewPig(this.map!, changes['newPigReport'].currentValue)
+      }
 
-  mapSubscribeDeletedReport(){
-    this.reportService.deletedPigReportChanges$.subscribe((data:PigReport)=>{
-      this.handleDeletePig(this.map!, data);
-    });
+      if (changes['deletedPigReport'] && changes['deletedPigReport'].currentValue) {
+        console.log(`Deleting pig: ${this.deletedPigReport}`)
+        this.handleDeletePig(this.map!, changes['newPigReport'].currentValue!)
+      }
+    }
   }
-
 
   handleNewPig(map: leaf.Map, newPigReport: PigReport) {
-    console.log(`handleNewPig`);
-    console.log(newPigReport);
-    if(this.markerMap.has(newPigReport.location)) {
-      this.markerMap.get(newPigReport.location)!.getPopup()?.remove();
-      this.markerMap.get(newPigReport.location)!.bindPopup(this.addPopup(this.pigReports!, newPigReport));
-    }
+    if(this.markerMap.has(newPigReport.location)) return;
 
-    let newMarker = this.generateMarker(map, newPigReport);
-    console.log(newMarker);
+    let newMarker = this.generateMarker(newPigReport);
     this.markerMap.set(newPigReport.location,newMarker);
 
   }
 
   handleDeletePig(map: leaf.Map , deletedPigReport: PigReport) {
-    console.log(`handleDeletePig`)
     if(!this.markerMap.has(deletedPigReport.location)){
       console.log("Location marker of pig not found!");
       return;
-    }
-
-    const count = this.pigReports?.filter((report)=> report.key === deletedPigReport.key).length;
-
-    console.log(count);
-    if(count === 1) {
-      this.markerMap.get(deletedPigReport.location)?.remove();
-      this.markerMap.delete(deletedPigReport.location);
     }
     this.markerMap.get(deletedPigReport.location)?.getPopup()?.remove();
     this.markerMap.get(deletedPigReport.location)?.bindPopup(this.addPopup(this.pigReports!,deletedPigReport));
@@ -121,11 +109,12 @@ export class MapComponent implements AfterViewInit{
   }
 
   addPopup(pigReports: PigReport[], pigReport:PigReport) {
+    //TODO: fix bug with reporting number of pigs within location
 
     // @ts-ignore
     let numPigs = 1;
     pigReports.forEach((report)=>{
-      if(report.location == pigReport.location) {
+      if(report.pigInfo.pigID != pigReport.pigInfo.pigID && report.location == pigReport.location) {
         ++numPigs;
       }
     })
@@ -135,13 +124,12 @@ export class MapComponent implements AfterViewInit{
        `)
   }
 
-  generateMarker(map: leaf.Map, pigReport: PigReport) {
+  generateMarker(pigReport: PigReport) {
     let marker = new leaf.Marker([pigReport.location.latitude, pigReport.location.longitude])
       .bindPopup(this.addPopup(this.pigReports!, pigReport))
       .on("click", () => {
         console.log("marker clicked")
       });
-    marker.addTo(map);
     return marker;
   }
 
@@ -154,9 +142,10 @@ export class MapComponent implements AfterViewInit{
     this.pigReports.forEach(pigReport =>{
       if(this.markerMap?.has(pigReport.location)) return;
 
-      let marker = this.generateMarker(map, pigReport);
+      let marker = this.generateMarker(pigReport);
 
       this.markerMap.set(pigReport.location, marker);
+      marker.addTo(map);
     })
     console.log(this.markerMap);
 

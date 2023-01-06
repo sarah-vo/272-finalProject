@@ -1,4 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {CommonModule} from "@angular/common";
 import {PigReport, Status} from "../../ts/PigReport";
 import {ReportService} from "../../service/report-service/report.service";
 
@@ -32,5 +33,3 @@ export class TableComponent {
     this.reportService.deleteReport(report);
   }
 }
-
-

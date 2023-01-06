@@ -1,11 +1,7 @@
 import {Injectable} from '@angular/core';
 import {PigReport} from "../../ts/PigReport";
 import {HttpClient} from "@angular/common/http";
-import {Subject} from "rxjs";
-import "blueimp-md5";
-import {Browser} from "leaflet";
-import win = Browser.win;
-import md5 from "blueimp-md5";
+import {Observable} from "rxjs";
 
 
 export interface Data{
@@ -24,11 +20,8 @@ export class ReportService {
   constructor(private http: HttpClient) { }
   reports : PigReport[] = [];
   url = `https://272.selfip.net/apps/yw1CIgsa3G/collections/pigs/documents/`;
-  newPigReportSource = new Subject<PigReport>();
-  newPigReportChanges$ = this.newPigReportSource.asObservable()
-  deletedPigReportSource = new Subject<PigReport>();
-  deletedPigReportChanges$ = this.deletedPigReportSource.asObservable()
-
+  newPigReport = new Observable<PigReport>;
+  deletedPigReport = new Observable<PigReport>;
 
 
 
@@ -40,34 +33,27 @@ export class ReportService {
     }
 
 
+    // return [
+    //   new PigReport(new Person("Sarah",0),new Pig(123,"Hock"),new PigLocation(-122.915667,49.278931,"SFU Burnaby"),Status.readyPickup, ""),
+    //   new PigReport(new Person("Darren",0),new Pig(123,"Hock"),new PigLocation(-122.915667,49.278931,"SFU Burnaby"),Status.readyPickup, ""),
+    //   new PigReport(new Person("Darrick",0),new Pig(123,"Hock"),new PigLocation(-122.915667,49.278931,"SFU Burnaby"),Status.readyPickup, ""),
+    //   new PigReport(new Person("John",0),new Pig(123,"Hock"),new PigLocation(-122.915667,49.278931,"SFU Burnaby"),Status.readyPickup, ""),
+    //   new PigReport(new Person("Timothy",0),new Pig(145,"Hock"),new PigLocation(-122.915667,49.278931,"SFU Burnaby"),Status.readyPickup, ""),
+    // ]
+
   deleteReport(report:PigReport): void{
-    console.log(`Report was sent for deletion`);
-    let windowPrompt = window.prompt("Type in password");
-    {
-        if (md5(windowPrompt!) == `84892b91ef3bf9d216bbc6e88d74a77c`) {
-          this.http.delete(this.url + report.key).subscribe((data: any) => {
-            console.log(data);
-          });
-          this.deletedPigReportSource.next(report);
-        }else{
-        window.alert(`Wrong password. Please try again`)}
-      }
+    console.log(`Report was sent for deletion`)
+    this.http.delete(this.url + report.key).subscribe((data:any)=>{
+      console.log(data);
+    })
   }
 
   addNewReport(report:PigReport) : void{
     console.log(`Report added:`);
-    let windowPrompt = window.prompt("Type in password");
-    console.log(`api.hashify.net/hash/md5/hex?value=${windowPrompt}`);
-    {
-        if (md5(windowPrompt!) == `84892b91ef3bf9d216bbc6e88d74a77c`) {
-          this.newPigReportSource.next(report);
-          console.log(report);
-          this.http.post<Data>(this.url,
-            {'key':report.key, 'data':report}).subscribe((data:any)=>{
-              console.log(data);})
-        }
-        else{
-          window.alert(`Wrong password. Please try again`)}
-      }
-    }
+    console.log(report);
+    this.http.post<Data>(this.url,
+      {'key':report.key, 'data':report}).subscribe((data:any)=>{
+        console.log(data);
+    })
+  }
 }
